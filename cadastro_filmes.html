@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Filmes</title>
+
+</head>
+<body>
+  <nav>
+
+    <a href="index.html">Início</a> |
+    <a href="cadastro_filmes.html">Cadastro de Filmes</a> |
+    <a href="cadastro_salas.html">Cadastro de Salas</a> |
+    <a href="cadastro_sessoes.html">Cadastro de Sessões</a> |
+    <a href="sessoes.html">Sessões Disponíveis</a> |
+    <a href="venda_ingressos.html">Venda de Ingressos</a>
+  </nav>
+  <hr>
+
+  <h1>Cadastro de Filmes</h1>
+
+  <form id="form-filme">
+
+    <label>Título: <input type="text" id="titulo" required></label><br>
+
+    <label>Descrição: <textarea id="descricao" required></textarea></label><br>
+
+    <label>Gênero:
+      <select id="genero" required>
+        <option value="">--- selecione ---</option>
+        <option>Ação</option>
+        <option>Comédia</option>
+        <option>Drama</option>
+        <option>Terror</option>
+      </select>
+    </label><br>
+
+    <label>Classificação:
+      <select id="classificacao" required>
+        <option value="">  --selecione--</option>
+        <option>Livre</option>
+        <option>10</option>
+        <option>12</option>
+        <option>14</option>
+        <option>16</option>
+        <option>18</option>
+      </select>
+    </label><br>
+
+    <label>Duração (min): <input type="number" id="duracao" min="1" required></label><br>
+    <label>Estreia: <input type="date" id="estreia" required></label><br>
+
+    <button type="submit">Salvar Filme</button>
+    <button type="button" id="limpar">Limpar</button>
+  </form>
+
+
+  <h2>Filmes Cadastrados</h2>
+  <ul id="lista-filmes"></ul>
+
+  <script>
+    'use strict';
+
+    const form = document.getElementById('form-filme');
+    const titulo = document.getElementById('titulo');
+    const descricao = document.getElementById('descricao');
+    const genero = document.getElementById('genero');
+    const classificacao = document.getElementById('classificacao');
+    const duracao = document.getElementById('duracao');
+    const estreia = document.getElementById('estreia');
+    const lista = document.getElementById('lista-filmes');
+
+    const getFilmes = () => JSON.parse(localStorage.getItem('filmes') || '[]');
+    const setFilmes = (arr) => localStorage.setItem('filmes', JSON.stringify(arr));
+
+    const render = () => {
+
+      const filmes = getFilmes();
+      lista.innerHTML = '';
+      filmes.forEach((f, i) => {
+
+        const li = document.createElement('li');
+        li.textContent = `${i + 1}. ${f.titulo} (${f.genero}) — ${f.duracao} min`;
+        lista.appendChild(li);
+      });
+    };
+
+    const limparForm = () => {
+
+      form.reset();
+      titulo.focus();
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const novo = {
+        titulo: titulo.value.trim(),
+        descricao: descricao.value.trim(),
+        genero: genero.value,
+        classificacao: classificacao.value,
+        duracao: Number(duracao.value),
+        estreia: estreia.value
+      };
+
+      const filmes = getFilmes();
+      filmes.push(novo);
+      setFilmes(filmes);
+      alert('Filme salvo!');
+      render();
+      limparForm();
+    });
+
+    document.getElementById('limpar').addEventListener('click', limparForm);
+
+    // p/ carregar lista ao abrir a página
+    render();
+  </script>
+</body>
+</html>
