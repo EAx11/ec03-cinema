@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+  <meta charset="UTF-8">
+  <title>Cadastro de Sessões</title>
+
+</head>
+<body>
+  <nav>
+
+    <a href="index.html">Início</a> |
+    <a href="cadastro_filmes.html">Cadastro de Filmes</a> |
+    <a href="cadastro_salas.html">Cadastro de Salas</a> |
+    <a href="cadastro_sessoes.html">Cadastro de Sessões</a> |
+    <a href="sessoes.html">Sessões Disponíveis</a> |
+    <a href="venda_ingressos.html">Venda de Ingressos</a>
+  </nav>
+  <hr>
+
+  <h1>Cadastro de Sessões</h1>
+
+  <form id="form-sessao">
+    <label>Filme:
+      <select id="filme" required></select>
+    </label><br>
+
+
+    <label>Sala:
+      <select id="sala" required></select>
+    </label><br>
+    
+
+    <label>Data e Hora:
+      <input type="datetime-local" id="dataHora" required>
+    </label><br>
+
+
+    <label>Preço:
+      <input type="number" id="preco" min="0" step="0.01" required>
+    </label><br>
+
+    <label>Idioma:
+      <select id="idioma" required>
+        <option>Dublado</option>
+        <option>Legendado</option>
+      </select>
+    </label><br>
+
+
+    <label>Formato:
+        
+
+      <select id="formato" required>
+        <option>2D</option>
+        <option>3D</option>
+      </select>
+    </label><br>
+
+    <button type="submit">Salvar Sessão</button>
+    <button type="button" id="limpar">Limpar</button>
+  </form>
+
+  <h2>Sessões Cadastradas</h2>
+  <ul id="lista-sessoes"></ul>
+
+  <script>
+    'use strict';
+
+    const selFilme = document.getElementById('filme');
+    const selSala = document.getElementById('sala');
+    const form = document.getElementById('form-sessao');
+    const dataHora = document.getElementById('dataHora');
+    const preco = document.getElementById('preco');
+    const idioma = document.getElementById('idioma');
+    const formato = document.getElementById('formato');
+    const lista = document.getElementById('lista-sessoes');
+
+    const get = (k) => JSON.parse(localStorage.getItem(k) || '[]');
+    const set = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+    const carregarSelects = () => {
+
+      const filmes = get('filmes');
+      const salas = get('salas');
+
+      selFilme.innerHTML = '';
+      selSala.innerHTML = '';
+
+      //filmes
+      filmes.forEach((f, i) => {
+        const op = document.createElement('option');
+        op.value = i; // index
+        op.textContent = f.titulo;
+        selFilme.appendChild(op);
+      });
+
+      //salas
+      salas.forEach((s, i) => {
+        const op = document.createElement('option');
+        op.value = i; //index
+        op.textContent = s.nome;
+        selSala.appendChild(op);
+      });
+    };
+
+    const render = () => {
+
+      const sessoes = get('sessoes');
+      const filmes = get('filmes');
+      const salas = get('salas');
+
+      lista.innerHTML = '';
+      sessoes.forEach((sx, i) => {
+        const li = document.createElement('li');
+        const filme = filmes[sx.filmeIndex]?.titulo || '(?)';
+        const sala = salas[sx.salaIndex]?.nome || '(?)';
+        li.textContent = `${i + 1}. ${filme} — ${sala} — ${sx.dataHora} — R$ ${Number(sx.preco).toFixed(2)} — ${sx.idioma} ${sx.formato}`;
+        lista.appendChild(li);
+
+      });
+    };
+
+    const limpar = () => {
+      form.reset();
+      dataHora.focus();
+    };
+
+    form.addEventListener('submit', (e) => {
+      
+      e.preventDefault();
+      const sessoes = get('sessoes');
+      const nova = {
+
+        filmeIndex: Number(selFilme.value),
+        salaIndex: Number(selSala.value),
+        dataHora: dataHora.value,
+        preco: Number(preco.value),
+        idioma: idioma.value,
+        formato: formato.value
+      };
+      sessoes.push(nova);
+
+      set('sessoes', sessoes);
+      alert('Sessão salva!');
+      render();
+      limpar();
+    });
+
+    document.getElementById('limpar').addEventListener('click', limpar);
+
+    carregarSelects();
+    render();
+  </script>
+</body>
+</html>
