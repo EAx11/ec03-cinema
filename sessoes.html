@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Sessões Disponíveis</title>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html">Início</a> |
+    <a href="cadastro-filmes.html">Cadastro de Filmes</a> |
+    <a href="cadastro-salas.html">Cadastro de Salas</a> |
+    <a href="cadastro-sessoes.html">Cadastro de Sessões</a> |
+    <a href="sessoes.html">Sessões Disponíveis</a> |
+    <a href="venda-ingressos.html">Venda de Ingressos</a>
+  </nav>
+  <hr>
+
+  <h1>Sessões Disponíveis</h1>
+
+
+  <table border="1" width="100%">
+    <thead>
+      <tr>
+        <th>Filme</th>
+        <th>Sala</th>
+        <th>Data/Hora</th>
+        <th>Preço</th>
+        <th>Idioma/Formato</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <script>
+    'use strict';
+
+    const get = (k) => JSON.parse(localStorage.getItem(k) || '[]');
+    const tbody = document.getElementById('tbody');
+
+    const render = () => {
+
+      const sessoes = get('sessoes');
+      const filmes = get('filmes');
+      const salas = get('salas');
+
+      tbody.innerHTML = '';
+
+      sessoes.forEach((sx, i) => {
+        const tr = document.createElement('tr');
+
+        const tdFilme = document.createElement('td');
+        tdFilme.textContent = filmes[sx.filmeIndex]?.titulo || '(?)';
+
+        const tdSala = document.createElement('td');
+        tdSala.textContent = salas[sx.salaIndex]?.nome || '(?)';
+
+
+        const tdData = document.createElement('td');
+        tdData.textContent = sx.dataHora;
+
+        const tdPreco = document.createElement('td');
+        tdPreco.textContent = `R$ ${Number(sx.preco).toFixed(2)}`;
+
+        const tdInfo = document.createElement('td');
+        tdInfo.textContent = `${sx.idioma} / ${sx.formato}`;
+
+        const tdAcao = document.createElement('td');
+        const link = document.createElement('a');
+        link.href = `venda-ingressos.html?sessao=${i}`;
+        link.textContent = 'Comprar';
+        tdAcao.appendChild(link);
+
+        tr.appendChild(tdFilme);
+        tr.appendChild(tdSala);
+        tr.appendChild(tdData);
+        tr.appendChild(tdPreco);
+        tr.appendChild(tdInfo);
+        tr.appendChild(tdAcao);
+        tbody.appendChild(tr);
+        
+      });
+    };
+
+    render();
+  </script>
+</body>
+</html>
