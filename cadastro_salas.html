@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Salas</title>
+</head>
+<body>
+  <nav>
+
+    <a href="index.html">Início</a> |
+    <a href="cadastro_filmes.html">Cadastro de Filmes</a> |
+    <a href="cadastro_salas.html">Cadastro de Salas</a> |
+    <a href="cadastro_sessoes.html">Cadastro de Sessões</a> |
+    <a href="sessoes.html">Sessões Disponíveis</a> |
+    <a href="venda-ingressos.html">Venda de Ingressos</a>
+
+  </nav>
+  <hr>
+
+  <h1>Cadastro de Salas</h1>
+
+  <form id="form-sala">
+    <label>Nome da Sala: <input type="text" id="nome" required></label><br>
+    <label>Capacidade: <input type="number" id="capacidade" min="1" required></label><br>
+    <label>Tipo:
+      <select id="tipo" required>
+        <option value="">-- selecione --</option>
+        <option>2D</option>
+        <option>3D</option>
+        <option>IMAX</option>
+      </select>
+    </label><br>
+
+    <button type="submit">Salvar Sala</button>
+    <button type="button" id="limpar ">Limpar</button>
+  </form>
+
+  <h2>Salas Cadastradas</h2>
+  <ul id="lista-salas"></ul>
+
+  <script>
+    'use strict';
+
+    const form = document.getElementById('form-sala');
+    const nome = document.getElementById('nome');
+    const capacidade = document.getElementById('capacidade');
+    const tipo = document.getElementById('tipo');
+
+    const lista = document.getElementById('lista-salas');
+
+    const getSalas = () => JSON.parse(localStorage.getItem('salas') || '[]');
+    const setSalas = (arr) => localStorage.setItem('salas', JSON.stringify(arr));
+
+    const render = () => {
+
+      const salas = getSalas();
+      lista.innerHTML = '';
+      salas.forEach((s, i) => {
+        const li = document.createElement('li');
+        li.textContent = `${i + 1}. ${s.nome} — ${s.tipo} — Cap: ${s.capacidade}`;
+        lista.appendChild(li);
+      });
+    };
+
+    const limparForm = () => {
+
+      form.reset();
+      nome.focus();
+    };
+
+    form.addEventListener('submit', (e) => {
+    4
+      e.preventDefault();
+      const nova = {
+        nome: nome.value.trim(),
+        capacidade: Number(capacidade.value),
+        tipo: tipo.value
+      };
+      const salas = getSalas();
+      salas.push(nova);
+      setSalas(salas);
+      alert('Sala salva!');
+      render();
+      limparForm();
+    });
+
+    document.getElementById('limpar').addEventListener('click', limparForm);
+
+    render();
+  </script>
+</body>
+</html>
