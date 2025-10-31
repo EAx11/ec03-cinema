@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Venda de Ingressos</title>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html">Início</a> |
+    <a href="cadastro_filmes.html">Cadastro de Filmes</a> |
+    <a href="cadastro_salas.html">Cadastro de Salas</a> |
+    <a href="cadastro_sessoes.html">Cadastro de Sessões</a> |
+    <a href="sessoes.html">Sessões Disponíveis</a> |
+    <a href="venda_ingressos.html">Venda de Ingressos</a>
+  </nav>
+  <hr>
+
+  <h1>Venda de Ingressos</h1>
+
+  <form id="form-venda">
+    <label>Sessão:
+      <select id="sessao" required></select>
+    </label><br>
+
+    <label>Nome do Cliente: <input type="text" id="cliente" required></label><br>
+    <label>CPF: <input type="text" id="cpf" required></label><br>
+    <label>Assento: <input type="text" id="assento" required></label><br>
+
+    <label>Pagamento:
+      <select id="pagamento" required>
+        <option>Cartão</option>
+        <option>Pix</option>
+        <option>Dinheiro</option>
+      </select>
+    </label><br>
+
+    <button type="submit">Confirmar Venda</button>
+    <button type="button" id="limpar">Limpar</button>
+  </form>
+
+  <h2>Vendas já realizadas</h2>
+  <ul id="lista-vendas"></ul>
+
+  
+  <script>
+    'use strict';
+
+    const get = (k) => JSON.parse(localStorage.getItem(k) || '[]');
+    const set = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+    const selSessao = document.getElementById('sessao');
+    const form = document.getElementById('form-venda');
+    const cliente = document.getElementById('cliente');
+    const cpf = document.getElementById('cpf');
+    const assento = document.getElementById('assento');
+    const pagamento = document.getElementById('pagamento');
+    const lista = document.getElementById('lista-vendas');
+
+    
+    const carregarSessoes = () => {
+
+      const sessoes = get('sessoes');
+      const filmes = get('filmes');
+      const salas = get('salas');
+
+      selSessao.innerHTML = '';
+      sessoes.forEach((sx, i) => {
+        const op = document.createElement('option');
+        const filme = filmes[sx.filmeIndex]?.titulo || '(?)';
+        const sala = salas[sx.salaIndex]?.nome || '(?)';
+        op.value = i;
+        op.textContent = `${filme} — ${sala} — ${sx.dataHora} — R$ ${Number(sx.preco).toFixed(2)}`;
+        selSessao.appendChild(op);
+      });
+
+    };
+
+
+    const renderVendas = () => {
+
+      const vendas = get('ingressos');
+      lista.innerHTML = '';
+      vendas.forEach((v, i) => {
+        const li = document.createElement('li');
+        li.textContent = `${i + 1}. Sessão ${v.sessaoIndex} — ${v.cliente} — CPF ${v.cpf} — Assento ${v.assento} — ${v.pagamento}`;
+        lista.appendChild(li);
+      });
+    };
+
+    const limpar = () => {
+      form.reset();
+      cliente.focus();
+    };
+
+    const preSelecionarSessao = () => {
+        
+      const params = new URLSearchParams(window.location.search);
+      const idx = params.get('sessao');
+      if (idx !== null) {
+        selSessao.value = String(idx);
+      }
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const vendas = get('ingressos');
+      const nova = {
+        sessaoIndex: Number(selSessao.value),
+        cliente: cliente.value.trim(),
+        cpf: cpf.value.trim(),
+        assento: assento.value.trim(),
+        pagamento: pagamento.value
+      };
+      vendas.push(nova);
+      set('ingressos', vendas);
+      alert('Venda registrada!');
+      renderVendas();
+      limpar();
+    });
+
+
+    document.getElementById('limpar').addEventListener('click', limpar);
+
+    carregarSessoes();
+    preSelecionarSessao();
+    renderVendas();
+
+  </script>
+</body>
+
+</html>
